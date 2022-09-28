@@ -3,12 +3,24 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "export": "next export",
+    "netlify": "netlify"
   },
   "dependencies": {
+    "@netlify/functions": "^1.2.0",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.0.2",
     "ethers": "^5.7.0",
     "next": "latest",
+    "node-fetch": "^2.6.7",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "react-lazy-load-image-component": "^1.5.5",
+    "react-loading": "^2.0.3",
+    "twitter-api-v2": "^1.12.7"
+  },
+  "devDependencies": {
+    "netlify-cli": "^11.8.3"
   }
 }

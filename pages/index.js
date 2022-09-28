@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { ethers } from 'ethers'
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 import MetaMaskError from '../components/metamask-error'
 import NetworkError from '../components/network-error'
@@ -8,9 +9,13 @@ import AccountError from '../components/account-error'
 import BalanceError from '../components/balance-error'
 import UploadNFT from '../components/upload-nft'
 
+import { getNFTs, setListener, CONTRACT_ADDRESS } from '../utils/contract'
+
+
 export default function Home() {
   const [error, setError] = useState("")
   const [account, setAccount] = useState("")
+  const [nfts, setNFTS] = useState([])
 
   const init = async () => {
     const { ethereum } = window
@@ -33,6 +38,7 @@ export default function Home() {
       return
     }
     setAccount(accounts[0])
+    initListener()
   }
 
   const connectWallet = async () => {
@@ -41,6 +47,9 @@ export default function Home() {
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
     setAccount(accounts[0])
     setError('')
+
+    const nfts = await getNFTs()    
+    setNFTS(nfts)
   }
 
   const checkBalance = async () => {
@@ -60,26 +69,49 @@ export default function Home() {
     }
   }
 
+  const uploadNFTs = async () => {
+    const nfts = await getNFTs()
+    
+    setNFTS(nfts)
+  }
+
+  const initListener = async () => {
+    setListener(async (from, tokenUri) => {
+      console.log('NewMakesickoNFTMInted', from, tokenUri.toString())
+      await uploadNFTs()
+    })
+
+    const nfts = await getNFTs()
+    setNFTS(nfts)
+  }
+
   useEffect(() => {
     init()
   }, [])
 
   useEffect(checkBalance, [account])
-  console.log({error})
+  console.log({error, nfts})
   return (
-    <div className="container">
+    <div>
       <Head>
-        <title>Makesicko NFT</title>
+        <title>iJS 2022 Demo</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
-        <h1 className="title">
-          Makesicko NFT
-        </h1>
+      <header>
+        <h1 className='container'>iJS 2022 Demo</h1>
+      </header>
+
+      <main className='container'>
+        
         { account && 
           <div>
-            <p>Account: {account}</p>
+            <p>
+              Contract: {CONTRACT_ADDRESS}
+            </p>
+            <p>
+              Account: {account}  
+            </p>
             <UploadNFT />
           </div>
         }
@@ -91,136 +123,52 @@ export default function Home() {
         { error === 'ACCOUNT' && (
           <div>
             <AccountError />
-            <button onClick={connectWallet}>Connect Wallet</button>
+            <br />
+            <a href='#' className='button' onClick={connectWallet}>Connect Your Wallet</a>
           </div>
         )}
 
         { error === 'BALANCE' && <BalanceError />}
-
+        
+        {
+          !!nfts.length && nfts.reverse().map((nft, index) => (
+            <div key={index} className="post">
+              <p>
+              <LazyLoadImage
+                src={nft.image}
+              />
+              </p>
+              <p>{nft.description}</p>
+              <p>{nft.name}</p>
+            </div>)
+          )
+        }
 
       </main>
 
       <style jsx>{`
         .container {
-          min-height: 100vh;
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
+          max-width: 1080px;
+          margin: 0 auto;
+        }
+
+        header {
+          background: #012a33;
+          color: white;
+          padding: 24px 0;
+        }
+
+        h1 {
+          margin: 0;
+          padding: 0;
         }
 
         main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
+          padding: 24px 0; 
         }
 
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer img {
-          margin-left: 0.5rem;
-        }
-
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        .title a {
-          color: #0070f3;
-          text-decoration: none;
-        }
-
-        .title a:hover,
-        .title a:focus,
-        .title a:active {
-          text-decoration: underline;
-        }
-
-        .title {
-          margin: 0;
-          line-height: 1.15;
-          font-size: 4rem;
-        }
-
-        .title,
-        .description {
-          text-align: center;
-        }
-
-        .description {
-          line-height: 1.5;
-          font-size: 1.5rem;
-        }
-
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
-
-        .grid {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-
-          max-width: 800px;
-          margin-top: 3rem;
-        }
-
-        .card {
-          margin: 1rem;
-          flex-basis: 45%;
-          padding: 1.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
-
-        .card:hover,
-        .card:focus,
-        .card:active {
-          color: #0070f3;
-          border-color: #0070f3;
-        }
-
-        .card h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1.5rem;
-        }
-
-        .card p {
-          margin: 0;
-          font-size: 1.25rem;
-          line-height: 1.5;
-        }
-
-        .logo {
-          height: 1em;
+        .post {
+          margin: 0 0 120px 0;
         }
 
         @media (max-width: 600px) {
@@ -236,9 +184,28 @@ export default function Home() {
         body {
           padding: 0;
           margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
+          font-family: monospace;
+          font-size: 1.5em;
+          background: #fdfdfd;
+          color: #012a33;
+        }
+
+        input {
+          font-size: 1em;
+          width: 100%;
+        }
+
+        img {
+          border-radius: 3px;
+          max-height: 640px;
+        }
+
+        .button {
+          text-decoration: none;
+          color: #012a33;
+          border: 2px solid #012a33;
+          padding: 12px 24px;
+          display: inline-block;
         }
 
         * {
