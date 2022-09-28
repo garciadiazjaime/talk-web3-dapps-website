@@ -83,7 +83,7 @@ export default function Home() {
 
     setInterval(() => {
       uploadNFTs()
-    }, 30 * 1000)
+    }, 20 * 1000)
 
     uploadNFTs()
   }

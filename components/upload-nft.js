@@ -33,6 +33,7 @@ export default function UploadNFT() {
         }
 
         setLoading(false)
+        inputRef.current.value = ''
     }
 
     return (
