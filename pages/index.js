@@ -96,6 +96,7 @@ export default function Home() {
       <Head>
         <title>iJS 2022 Demo</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
       <header>
@@ -106,10 +107,10 @@ export default function Home() {
         
         { account && 
           <div>
-            <p>
+            <p className='meta'>
               Contract: {CONTRACT_ADDRESS}
             </p>
-            <p>
+            <p className='meta'>
               Account: {account}  
             </p>
             <UploadNFT />
@@ -171,6 +172,14 @@ export default function Home() {
           margin: 0 0 120px 0;
         }
 
+        p {
+          word-break: break-word;
+        }
+
+        .meta {
+          overflow: scroll;
+        }
+
         @media (max-width: 600px) {
           .grid {
             width: 100%;
@@ -198,6 +207,7 @@ export default function Home() {
         img {
           border-radius: 3px;
           max-height: 640px;
+          max-width: 100%;
         }
 
         .button {
