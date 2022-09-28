@@ -81,8 +81,11 @@ export default function Home() {
       await uploadNFTs()
     })
 
-    const nfts = await getNFTs()
-    setNFTS(nfts)
+    setInterval(() => {
+      uploadNFTs()
+    }, 30 * 1000)
+
+    uploadNFTs()
   }
 
   useEffect(() => {
@@ -107,10 +110,10 @@ export default function Home() {
         
         { account && 
           <div>
-            <p className='meta'>
+            <p>
               Contract: {CONTRACT_ADDRESS}
             </p>
-            <p className='meta'>
+            <p>
               Account: {account}  
             </p>
             <UploadNFT />
@@ -176,10 +179,6 @@ export default function Home() {
           word-break: break-word;
         }
 
-        .meta {
-          overflow: scroll;
-        }
-
         @media (max-width: 600px) {
           .grid {
             width: 100%;
@@ -200,7 +199,7 @@ export default function Home() {
         }
 
         input {
-          font-size: 1em;
+          font-size: 1.5em;
           width: 100%;
         }
 

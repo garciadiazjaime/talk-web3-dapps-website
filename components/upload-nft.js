@@ -17,11 +17,16 @@ export default function UploadNFT() {
     const inputRef = useRef(null)
     const [ loading, setLoading ] = useState(false)
     const mintHandler = async (event) => {
+        const url = inputRef.current.value
+        if (!url) {
+            return
+        }
+
         event.preventDefault()
         setLoading(true)
         
         try {
-            const nftBase64 = await getNFTBase64(inputRef.current.value)
+            const nftBase64 = await getNFTBase64(url)
             await mintNFT(nftBase64)
         } catch(error) {
             console.log(error)
